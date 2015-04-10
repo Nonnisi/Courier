@@ -79,7 +79,6 @@ class CourierCommands /*extends ServerListener*/ implements CommandExecutor
     */
     boolean commandInformation( Player player, String[] args )
     {
-        boolean retVal = false;
         if( args != null && args.length > 0 )
         {
             if( args[0].equalsIgnoreCase( "fees" ) )
@@ -103,7 +102,6 @@ class CourierCommands /*extends ServerListener*/ implements CommandExecutor
                 {
                     Courier.display( player, plugin.getCConfig().getLetterInfoFree() );
                 }
-                retVal = true;
             }
             else if( args[0].equalsIgnoreCase( "unread" ) )
             {
@@ -115,7 +113,6 @@ class CourierCommands /*extends ServerListener*/ implements CommandExecutor
                 {
                     Courier.display( player, plugin.getCConfig().getPostmanNoUnreadMail() );
                 }
-                retVal = true;
             }
             // todo: implement /courier list
         }
@@ -125,9 +122,8 @@ class CourierCommands /*extends ServerListener*/ implements CommandExecutor
             Courier.display( player, plugin.getCConfig().getInfoLine2() );
             Courier.display( player, plugin.getCConfig().getInfoLine3() );
             Courier.display( player, plugin.getCConfig().getInfoLine4() );
-            retVal = true;
         }
-        return retVal;
+        return true;
     }
 
     /*
@@ -186,7 +182,6 @@ class CourierCommands /*extends ServerListener*/ implements CommandExecutor
     */
     boolean commandPost( Player player, String[] args )
     {
-        boolean ret = false;
         ItemStack item = player.getItemInHand();
         Letter letter = null;
         if( item != null && item.getType() == Material.MAP )
@@ -200,7 +195,6 @@ class CourierCommands /*extends ServerListener*/ implements CommandExecutor
                     !player.hasPermission( Courier.PM_THEONEPERCENT ) )
             {
                 Courier.display( player, plugin.getCConfig().getPostNoCredit( plugin.getEconomy().format( plugin.getCConfig().getFeeSend() ) ) );
-                ret = true;
             }
             else if( args == null || args.length < 1 )
             {
@@ -338,14 +332,13 @@ class CourierCommands /*extends ServerListener*/ implements CommandExecutor
                         }
                     }
                 }
-                ret = true;
             }
         }
         else
         {
             Courier.display( player, plugin.getCConfig().getPostNoLetter() );
         }
-        return ret;
+        return true;
     }
 
     /*
@@ -364,7 +357,6 @@ class CourierCommands /*extends ServerListener*/ implements CommandExecutor
             return false;
         }
         // letter message - builds upon message in hand
-        boolean ret = false;
         try
         {
             ItemStack item = player.getItemInHand();
@@ -489,10 +481,6 @@ class CourierCommands /*extends ServerListener*/ implements CommandExecutor
                                 meta.setLore( strings );
                                 letterItem.setItemMeta( meta );
                             }
-                            else
-                            {
-                                // ???
-                            }
 
                             // if empty hands || crafted && itemInHand == single Courier parchment
                             //   setItemInHand
@@ -553,33 +541,23 @@ class CourierCommands /*extends ServerListener*/ implements CommandExecutor
                         Courier.display( player, plugin.getCConfig().getLetterCreateFailed() );
                         plugin.getCConfig().clog( Level.SEVERE, "Could not store letter in database!" );
                     }
-                    ret = true;
-                }
-                else
-                {
-                    // we were security blocked
-                    ret = true;
                 }
             }
             else
             {
                 // letter was never created, feedback why has been sent to player
-                ret = true;
             }
         }
         catch( InternalError e )
         {
             Courier.display( player, plugin.getCConfig().getLetterNoMoreUIDs() );
             plugin.getCConfig().clog( Level.SEVERE, "Out of unique message IDs!" );
-            ret = true;
         }
-        return ret;
+        return true;
     }
 
     public boolean onCommand( CommandSender sender, Command command, String label, String[] args )
     {
-        boolean ret = false;
-
         Player player = null;
         if( sender instanceof Player )
         {
@@ -593,24 +571,24 @@ class CourierCommands /*extends ServerListener*/ implements CommandExecutor
         if( cmd.equals( Courier.CMD_COURIER ) && allowed( player, cmd ) )
         {
             // not allowed to be run from the console, uses player
-            ret = commandInformation( player, args );
+            commandInformation( player, args );
         }
         else if( ( cmd.equals( Courier.CMD_LETTER ) ) && allowed( player, cmd ) )
         {
             // not allowed to be run from the console, uses player
-            ret = commandLetter( player, args );
+            commandLetter( player, args );
         }
         else if( ( cmd.equals( Courier.CMD_POST ) ) && allowed( player, cmd ) )
         {
             // not allowed to be run from the console, uses player
-            ret = commandPost( player, args );
+            commandPost( player, args );
         }
         else if( cmd.equals( Courier.CMD_POSTMAN ) && allowed( player, cmd ) )
         {
             // not allowed to be run from the console, uses player
-            ret = commandPostman( player );
+            commandPostman( player );
         }
-        return ret;
+        return true;
     }
 
     // helper methods
