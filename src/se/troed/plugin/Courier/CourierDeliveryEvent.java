@@ -5,38 +5,46 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-class CourierDeliveryEvent extends Event implements Cancellable {
+class CourierDeliveryEvent extends Event implements Cancellable
+{
     private static final HandlerList handlers = new HandlerList();
     private boolean cancelled;
     private final Player player;
     private final int id;
 
-    public CourierDeliveryEvent(Player p, int id) {
+    public CourierDeliveryEvent( Player p, int id )
+    {
         player = p;
         this.id = id;
     }
 
-    public HandlerList getHandlers() {
+    public HandlerList getHandlers()
+    {
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
+    public static HandlerList getHandlerList()
+    {
         return handlers;
     }
 
-    public boolean isCancelled() {
+    public boolean isCancelled()
+    {
         return cancelled;
     }
 
-    public void setCancelled(boolean b) {
+    public void setCancelled( boolean b )
+    {
         this.cancelled = b;
     }
-    
-    public Player getPlayer() {
+
+    public Player getPlayer()
+    {
         return player;
     }
 
-    public int getId() {
+    public int getId()
+    {
         return id;
     }
 }

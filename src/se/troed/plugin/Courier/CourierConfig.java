@@ -8,7 +8,6 @@ import org.bukkit.map.MapPalette;
 import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -17,7 +16,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class CourierConfig {
+public class CourierConfig
+{
     private static final boolean debug = false;
 
     private final Logger log;
@@ -101,409 +101,498 @@ public class CourierConfig {
     private EntityType type = null;
 
     private final String version;
-    
-    public CourierConfig(Courier plug) {
+
+    public CourierConfig( Courier plug )
+    {
 
         log = plug.getServer().getLogger();
 
         config = plug.getConfig();
         PluginDescriptionFile pdfFile = plug.getDescription();
         this.version = pdfFile.getVersion(); // actual plugin version
-        
+
         // verify config compatibility with config file version (could be different from plugin)
-        String configVersion = config.getString(pdfFile.getName() + ".Version");
-        if(versionCompare(configVersion, VERSIONBREAK) < 0) {
+        String configVersion = config.getString( pdfFile.getName() + ".Version" );
+        if( versionCompare( configVersion, VERSIONBREAK ) < 0 )
+        {
             // config file not valid - abort plugin load
-            clog(Level.SEVERE, "Config file version too old - unexpected behaviour might occur!");
+            clog( Level.SEVERE, "Config file version too old - unexpected behaviour might occur!" );
         }
 
-        useFees = config.getBoolean(USEFEES, false); // added in 0.9.5
-        clog(Level.FINE, USEFEES + ": " + useFees);
-        updateInterval = config.getInt(UPDATEINTERVAL, 18000); // added in v1.1.0
-        clog(Level.FINE, UPDATEINTERVAL + ": " + updateInterval);
-        feeSend = config.getDouble(FEE_SEND, 0); // added in 0.9.5
-        clog(Level.FINE, FEE_SEND + ": " + feeSend);
-        quickDespawnTime = config.getInt(POSTMAN_QUICK_DESPAWN);
-        clog(Level.FINE, POSTMAN_QUICK_DESPAWN + ": " + quickDespawnTime);
-        despawnTime = config.getInt(POSTMAN_DESPAWN);
-        clog(Level.FINE, POSTMAN_DESPAWN + ": " + despawnTime);
-        initialWait = config.getInt(ROUTE_INITIALWAIT);
-        clog(Level.FINE, ROUTE_INITIALWAIT + ": " + initialWait);
-        nextRoute = config.getInt(ROUTE_NEXTROUTE);
-        clog(Level.FINE, ROUTE_NEXTROUTE + ": " + nextRoute);
-        walkToPlayer = config.getBoolean(ROUTE_WALKTOPLAYER, true); // added in 1.1.0
-        clog(Level.FINE, ROUTE_WALKTOPLAYER + ": " + walkToPlayer);
+        useFees = config.getBoolean( USEFEES, false ); // added in 0.9.5
+        clog( Level.FINE, USEFEES + ": " + useFees );
+        updateInterval = config.getInt( UPDATEINTERVAL, 18000 ); // added in v1.1.0
+        clog( Level.FINE, UPDATEINTERVAL + ": " + updateInterval );
+        feeSend = config.getDouble( FEE_SEND, 0 ); // added in 0.9.5
+        clog( Level.FINE, FEE_SEND + ": " + feeSend );
+        quickDespawnTime = config.getInt( POSTMAN_QUICK_DESPAWN );
+        clog( Level.FINE, POSTMAN_QUICK_DESPAWN + ": " + quickDespawnTime );
+        despawnTime = config.getInt( POSTMAN_DESPAWN );
+        clog( Level.FINE, POSTMAN_DESPAWN + ": " + despawnTime );
+        initialWait = config.getInt( ROUTE_INITIALWAIT );
+        clog( Level.FINE, ROUTE_INITIALWAIT + ": " + initialWait );
+        nextRoute = config.getInt( ROUTE_NEXTROUTE );
+        clog( Level.FINE, ROUTE_NEXTROUTE + ": " + nextRoute );
+        walkToPlayer = config.getBoolean( ROUTE_WALKTOPLAYER, true ); // added in 1.1.0
+        clog( Level.FINE, ROUTE_WALKTOPLAYER + ": " + walkToPlayer );
 
-        String stype = config.getString(POSTMAN_TYPE, "Enderman"); // added in 1.1.0
-        type = EntityType.fromName(stype);
-        if(type == null) {
+        String stype = config.getString( POSTMAN_TYPE, "Enderman" ); // added in 1.1.0
+        type = EntityType.fromName( stype );
+        if( type == null )
+        {
             type = EntityType.ENDERMAN;
-            clog(Level.WARNING, "Postman.Type: " + stype + " is not a valid Creature, using default.");
+            clog( Level.WARNING, "Postman.Type: " + stype + " is not a valid Creature, using default." );
         }
-        clog(Level.FINE, POSTMAN_TYPE + ": " + type.getName());
+        clog( Level.FINE, POSTMAN_TYPE + ": " + type.getName() );
 
-        spawnDistance = config.getInt(POSTMAN_SPAWNDISTANCE);
-        clog(Level.FINE, POSTMAN_SPAWNDISTANCE + ": " + spawnDistance);
-        breakSpawnProtection = config.getBoolean(POSTMAN_BREAKSPAWNPROTECTION, true); // added in 0.9.6
-        clog(Level.FINE, POSTMAN_BREAKSPAWNPROTECTION + ": " + breakSpawnProtection);
-        showDate = config.getBoolean(LETTER_SHOWDATE, true); // added in 1.1.0
-        clog(Level.FINE, LETTER_SHOWDATE + ": " + showDate);
+        spawnDistance = config.getInt( POSTMAN_SPAWNDISTANCE );
+        clog( Level.FINE, POSTMAN_SPAWNDISTANCE + ": " + spawnDistance );
+        breakSpawnProtection = config.getBoolean( POSTMAN_BREAKSPAWNPROTECTION, true ); // added in 0.9.6
+        clog( Level.FINE, POSTMAN_BREAKSPAWNPROTECTION + ": " + breakSpawnProtection );
+        showDate = config.getBoolean( LETTER_SHOWDATE, true ); // added in 1.1.0
+        clog( Level.FINE, LETTER_SHOWDATE + ": " + showDate );
 
-        freeLetter = config.getBoolean(LETTER_FREE, true); // added in 1.1.5
-        clog(Level.FINE, LETTER_FREE + ": " + freeLetter);
+        freeLetter = config.getBoolean( LETTER_FREE, true ); // added in 1.1.5
+        clog( Level.FINE, LETTER_FREE + ": " + freeLetter );
 
-        List<String> letterResources = config.getStringList(LETTER_RESOURCES); // added in 1.1.5
-        if(letterResources != null) {
-            for(String resource : letterResources) {
-                Material material = Material.matchMaterial(resource);
-                if(material != null) {
+        List<String> letterResources = config.getStringList( LETTER_RESOURCES ); // added in 1.1.5
+        if( letterResources != null )
+        {
+            for( String resource : letterResources )
+            {
+                Material material = Material.matchMaterial( resource );
+                if( material != null )
+                {
                     boolean added = false;
-                    for(ItemStack is : letterStacks) {
-                        if(is.getType() == material) {
+                    for( ItemStack is : letterStacks )
+                    {
+                        if( is.getType() == material )
+                        {
                             // add to this existing stack
-                            is.setAmount(is.getAmount() + 1);
+                            is.setAmount( is.getAmount() + 1 );
                             added = true;
                             break;
                         }
                     }
-                    if(!added) {
+                    if( !added )
+                    {
                         // create new stack
-                        letterStacks.add(new MaterialData(material).toItemStack(1));
+                        letterStacks.add( new MaterialData( material ).toItemStack( 1 ) );
                     }
-                } else {
-                    clog(Level.WARNING, "Cannot parse \'" + resource + "\' into a valid Minecraft resource! Skipped.");
+                }
+                else
+                {
+                    clog( Level.WARNING, "Cannot parse \'" + resource + "\' into a valid Minecraft resource! Skipped." );
                 }
             }
-            clog(Level.FINE, LETTER_RESOURCES + ": " + letterStacks.toString());
+            clog( Level.FINE, LETTER_RESOURCES + ": " + letterStacks.toString() );
         }
 
-        sealedEnvelope = config.getBoolean(PRIVACY_SEALED, true); // added in 0.9.11
-        clog(Level.FINE, PRIVACY_SEALED + ": " + sealedEnvelope);
+        sealedEnvelope = config.getBoolean( PRIVACY_SEALED, true ); // added in 0.9.11
+        clog( Level.FINE, PRIVACY_SEALED + ": " + sealedEnvelope );
     }
-    
-    public String getVersion() {
+
+    public String getVersion()
+    {
         return version;
     }
-    
-    public int getUpdateInterval() {
+
+    public int getUpdateInterval()
+    {
         return updateInterval;
     }
 
-    public boolean getUseFees() {
+    public boolean getUseFees()
+    {
         return useFees;
     }
 
-    public int getQuickDespawnTime() {
+    public int getQuickDespawnTime()
+    {
         return quickDespawnTime;
     }
 
-    public int getDespawnTime() {
+    public int getDespawnTime()
+    {
         return despawnTime;
     }
 
-    public int getInitialWait() {
+    public int getInitialWait()
+    {
         return initialWait;
     }
 
-    public int getNextRoute() {
+    public int getNextRoute()
+    {
         return nextRoute;
     }
 
-    public boolean getWalkToPlayer() {
+    public boolean getWalkToPlayer()
+    {
         return walkToPlayer;
     }
 
-    public EntityType getType() {
+    public EntityType getType()
+    {
         return type;
     }
 
-    public int getSpawnDistance() {
+    public int getSpawnDistance()
+    {
         return spawnDistance;
     }
 
-    public boolean getShowDate() {
+    public boolean getShowDate()
+    {
         return showDate;
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean getFreeLetter() {
+    @SuppressWarnings( "BooleanMethodIsAlwaysInverted" )
+    public boolean getFreeLetter()
+    {
         return freeLetter;
     }
 
-    public List<ItemStack> getLetterResources() {
+    public List<ItemStack> getLetterResources()
+    {
         return letterStacks;
     }
 
-    public boolean getRequiresCrafting() {
-        return config.getBoolean(LETTER_REQUIRESCRAFTING, false);
+    public boolean getRequiresCrafting()
+    {
+        return config.getBoolean( LETTER_REQUIRESCRAFTING, false );
     }
 
-    public boolean getBreakSpawnProtection() {
+    public boolean getBreakSpawnProtection()
+    {
         return breakSpawnProtection;
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean getSealedEnvelope() {
+    @SuppressWarnings( "BooleanMethodIsAlwaysInverted" )
+    public boolean getSealedEnvelope()
+    {
         return sealedEnvelope;
     }
 
-    public boolean getLetterFrameable() {
-        return config.getBoolean(LETTER_FRAMEABLE, true);
+    public boolean getLetterFrameable()
+    {
+        return config.getBoolean( LETTER_FRAMEABLE, true );
     }
 
-    public boolean getCreativeDelivery() {
-        return config.getBoolean(POSTMAN_CREATIVEDELIVERY, false);
+    public boolean getCreativeDelivery()
+    {
+        return config.getBoolean( POSTMAN_CREATIVEDELIVERY, false );
     }
 
-    public String getBankAccount() {
-        return config.getString(FEE_BANKACCOUNT, "");
+    public String getBankAccount()
+    {
+        return config.getString( FEE_BANKACCOUNT, "" );
     }
 
-    public Double getFeeSend() {
+    public Double getFeeSend()
+    {
         return feeSend;
     }
 
-    public int getVanishDistance() {
-        return config.getInt(POSTMAN_VANISHDISTANCE, 0);
+    public int getVanishDistance()
+    {
+        return config.getInt( POSTMAN_VANISHDISTANCE, 0 );
     }
 
     // translatable strings
 
-    public String getGreeting() {
-        return colorize(config.getString(POSTMAN_GREETING, "")); // added in 0.9.1
+    public String getGreeting()
+    {
+        return colorize( config.getString( POSTMAN_GREETING, "" ) ); // added in 0.9.1
     }
 
-    public String getMailDrop() {
-        return colorize(config.getString(POSTMAN_MAILDROP, "")); // added in 0.9.1
+    public String getMailDrop()
+    {
+        return colorize( config.getString( POSTMAN_MAILDROP, "" ) ); // added in 0.9.1
     }
 
-    public String getInventory() {
-        return colorize(config.getString(POSTMAN_INVENTORY, "")); // added in 0.9.5
+    public String getInventory()
+    {
+        return colorize( config.getString( POSTMAN_INVENTORY, "" ) ); // added in 0.9.5
     }
 
-    public String getCannotDeliver() {
-        return colorize(config.getString(POSTMAN_CANNOTDELIVER, "")); // added in 0.9.6
+    public String getCannotDeliver()
+    {
+        return colorize( config.getString( POSTMAN_CANNOTDELIVER, "" ) ); // added in 0.9.6
     }
 
-    public String getLetterDrop() {
-        return colorize(config.getString(LETTER_DROP, "")); // added in 0.9.10
+    public String getLetterDrop()
+    {
+        return colorize( config.getString( LETTER_DROP, "" ) ); // added in 0.9.10
     }
 
-    public String getLetterInventory() {
-        return colorize(config.getString(LETTER_INVENTORY, "")); // added in 0.9.10
+    public String getLetterInventory()
+    {
+        return colorize( config.getString( LETTER_INVENTORY, "" ) ); // added in 0.9.10
     }
 
-    public String getInfoFee(String fee) {
-        return String.format(colorize(config.getString(FEE_INFOFEE, "")), fee); // 1.1.0
+    public String getInfoFee( String fee )
+    {
+        return String.format( colorize( config.getString( FEE_INFOFEE, "" ) ), fee ); // 1.1.0
     }
 
-    public String getInfoNoFee() {
-        return colorize(config.getString(FEE_INFONOFEE, "")); // 1.1.0
+    public String getInfoNoFee()
+    {
+        return colorize( config.getString( FEE_INFONOFEE, "" ) ); // 1.1.0
     }
 
     // LetterRender colorization
-    public String getPrivacyLocked(String player) {
-        return String.format(colorize2(config.getString(PRIVACY_LOCKED)), player); // 1.1.8
+    public String getPrivacyLocked( String player )
+    {
+        return String.format( colorize2( config.getString( PRIVACY_LOCKED ) ), player ); // 1.1.8
     }
 
-    public String getPostmanExtraDeliveries() {
-        return colorize(config.getString(POSTMAN_EXTRADELIVERIES, "")); // 1.1.0
+    public String getPostmanExtraDeliveries()
+    {
+        return colorize( config.getString( POSTMAN_EXTRADELIVERIES, "" ) ); // 1.1.0
     }
 
-    public String getPostmanNoUnreadMail() {
-        return colorize(config.getString(POSTMAN_NOUNREADMAIL, "")); // 1.1.0
+    public String getPostmanNoUnreadMail()
+    {
+        return colorize( config.getString( POSTMAN_NOUNREADMAIL, "" ) ); // 1.1.0
     }
 
-    public String getPostNoCredit(String fee) {
-        return String.format(colorize(config.getString(POST_NOCREDIT, "")), fee); // 1.1.0
+    public String getPostNoCredit( String fee )
+    {
+        return String.format( colorize( config.getString( POST_NOCREDIT, "" ) ), fee ); // 1.1.0
     }
 
-    public String getPostNoRecipient() {
-        return colorize(config.getString(POST_NORECIPIENT, "")); // 1.1.0
+    public String getPostNoRecipient()
+    {
+        return colorize( config.getString( POST_NORECIPIENT, "" ) ); // 1.1.0
     }
 
-    public String getPostDidYouMean(String input, String match) {
-        return String.format(colorize(config.getString(POST_DIDYOUMEAN, "")), input, match); // 1.1.0
+    public String getPostDidYouMean( String input, String match )
+    {
+        return String.format( colorize( config.getString( POST_DIDYOUMEAN, "" ) ), input, match ); // 1.1.0
     }
 
-    public String getPostDidYouMeanList(String input) {
-        return String.format(colorize(config.getString(POST_DIDYOUMEANLIST, "")), input); // 1.1.0
+    public String getPostDidYouMeanList( String input )
+    {
+        return String.format( colorize( config.getString( POST_DIDYOUMEANLIST, "" ) ), input ); // 1.1.0
     }
 
-    public String getPostDidYouMeanList2(String list) {
-        return String.format(colorize(config.getString(POST_DIDYOUMEANLIST2, "")), list); // 1.1.0
+    public String getPostDidYouMeanList2( String list )
+    {
+        return String.format( colorize( config.getString( POST_DIDYOUMEANLIST2, "" ) ), list ); // 1.1.0
     }
 
-    public String getPostNoSuchPlayer(String input) {
-        return String.format(colorize(config.getString(POST_NOSUCHPLAYER, "")), input); // 1.1.0
+    public String getPostNoSuchPlayer( String input )
+    {
+        return String.format( colorize( config.getString( POST_NOSUCHPLAYER, "" ) ), input ); // 1.1.0
     }
 
-    public String getPostLetterSent(String recipient) {
-        return String.format(colorize(config.getString(POST_LETTERSENT, "")), recipient); // 1.1.0
+    public String getPostLetterSent( String recipient )
+    {
+        return String.format( colorize( config.getString( POST_LETTERSENT, "" ) ), recipient ); // 1.1.0
     }
 
-    public String getPostLetterSentFee(String recipient, String fee) {
-        return String.format(colorize(config.getString(POST_LETTERSENTFEE, "")), recipient, fee); // 1.1.0
+    public String getPostLetterSentFee( String recipient, String fee )
+    {
+        return String.format( colorize( config.getString( POST_LETTERSENTFEE, "" ) ), recipient, fee ); // 1.1.0
     }
 
-    public String getPostFundProblem() {
-        return colorize(config.getString(POST_FUNDPROBLEM, "")); // 1.1.0
+    public String getPostFundProblem()
+    {
+        return colorize( config.getString( POST_FUNDPROBLEM, "" ) ); // 1.1.0
     }
 
-    public String getPostNoLetter() {
-        return colorize(config.getString(POST_NOLETTER, "")); // 1.1.0
+    public String getPostNoLetter()
+    {
+        return colorize( config.getString( POST_NOLETTER, "" ) ); // 1.1.0
     }
 
-    public String getLetterNoText() {
-        return colorize(config.getString(LETTER_NOTEXT, "")); // 1.1.0
+    public String getLetterNoText()
+    {
+        return colorize( config.getString( LETTER_NOTEXT, "" ) ); // 1.1.0
     }
 
-    public String getLetterSkippedText() {
-        return colorize(config.getString(LETTER_SKIPPEDTEXT, "")); // 1.1.0
+    public String getLetterSkippedText()
+    {
+        return colorize( config.getString( LETTER_SKIPPEDTEXT, "" ) ); // 1.1.0
     }
 
-    public String getLetterCreateFailed() {
-        return colorize(config.getString(LETTER_CREATEFAILED, "")); // 1.1.0
+    public String getLetterCreateFailed()
+    {
+        return colorize( config.getString( LETTER_CREATEFAILED, "" ) ); // 1.1.0
     }
 
-    public String getLetterNoMoreUIDs() {
-        return colorize(config.getString(LETTER_NOMOREUIDS, "")); // 1.1.0
+    public String getLetterNoMoreUIDs()
+    {
+        return colorize( config.getString( LETTER_NOMOREUIDS, "" ) ); // 1.1.0
     }
 
-    public String getLetterInfoCost(String resources) {
-        return String.format(colorize(config.getString(LETTER_INFOCOST, "")), resources); // 1.1.5
+    public String getLetterInfoCost( String resources )
+    {
+        return String.format( colorize( config.getString( LETTER_INFOCOST, "" ) ), resources ); // 1.1.5
     }
 
-    public String getLetterInfoFree() {
-        return colorize(config.getString(LETTER_INFOFREE, "")); // 1.1.5
+    public String getLetterInfoFree()
+    {
+        return colorize( config.getString( LETTER_INFOFREE, "" ) ); // 1.1.5
     }
 
-    public String getLetterLackingResources() {
-        return colorize(config.getString(LETTER_LACKINGRESOURCES, "")); // 1.1.5
+    public String getLetterLackingResources()
+    {
+        return colorize( config.getString( LETTER_LACKINGRESOURCES, "" ) ); // 1.1.5
     }
 
-    public String getLetterNoCraftedFound() {
-        return colorize(config.getString(LETTER_NOCRAFTEDFOUND, "")); // 1.1.8
+    public String getLetterNoCraftedFound()
+    {
+        return colorize( config.getString( LETTER_NOCRAFTEDFOUND, "" ) ); // 1.1.8
     }
 
     // Lore should not be colorized
-    public String getLetterDisplayName() {
-        return strip(config.getString(LETTER_DISPLAYNAME, "")); // 1.1.8
+    public String getLetterDisplayName()
+    {
+        return strip( config.getString( LETTER_DISPLAYNAME, "" ) ); // 1.1.8
     }
 
     // Lore should not be colorized
-    public String getLetterFrom(String player) {
-        return String.format(strip(config.getString(LETTER_FROM)), player); // 1.1.8
+    public String getLetterFrom( String player )
+    {
+        return String.format( strip( config.getString( LETTER_FROM ) ), player ); // 1.1.8
     }
 
     // LetterRenderer version
-    public String getLetterFrom2(String player) {
-        return String.format(colorize2(config.getString(LETTER_FROM)), player); // 1.1.8
+    public String getLetterFrom2( String player )
+    {
+        return String.format( colorize2( config.getString( LETTER_FROM ) ), player ); // 1.1.8
     }
 
     // Lore should not be colorized
-    public String getLetterTo(String player) {
-        return String.format(strip(config.getString(LETTER_TO)), player); // 1.1.8
+    public String getLetterTo( String player )
+    {
+        return String.format( strip( config.getString( LETTER_TO ) ), player ); // 1.1.8
     }
 
     // Lore should not be colorized
-    public String getParchmentDisplayName() {
-        return strip(config.getString(PARCHMENT_DISPLAYNAME, "")); // 1.1.8
+    public String getParchmentDisplayName()
+    {
+        return strip( config.getString( PARCHMENT_DISPLAYNAME, "" ) ); // 1.1.8
     }
 
-    public String getInfoLine1() {
-        return colorize(config.getString(INFO_LINE1, "")); // 1.1.0
+    public String getInfoLine1()
+    {
+        return colorize( config.getString( INFO_LINE1, "" ) ); // 1.1.0
     }
 
-    public String getInfoLine2() {
-        return colorize(config.getString(INFO_LINE2, "")); // 1.1.0
+    public String getInfoLine2()
+    {
+        return colorize( config.getString( INFO_LINE2, "" ) ); // 1.1.0
     }
 
-    public String getInfoLine3() {
-        return colorize(config.getString(INFO_LINE3, "")); // 1.1.0
+    public String getInfoLine3()
+    {
+        return colorize( config.getString( INFO_LINE3, "" ) ); // 1.1.0
     }
 
-    public String getInfoLine4() {
-        return colorize(config.getString(INFO_LINE4, "")); // 1.1.0
+    public String getInfoLine4()
+    {
+        return colorize( config.getString( INFO_LINE4, "" ) ); // 1.1.0
     }
 
-    @SuppressWarnings({"PointlessBooleanExpression", "ConstantConditions"})
-    void clog(Level level, String message) {
-        if(!debug && (level != Level.SEVERE && level != Level.WARNING && level != Level.INFO)) {
+    @SuppressWarnings( { "PointlessBooleanExpression", "ConstantConditions" } )
+    void clog( Level level, String message )
+    {
+        if( !debug && ( level != Level.SEVERE && level != Level.WARNING && level != Level.INFO ) )
+        {
             return;
         }
         // Bukkit doesn't log CONFIG, FINE etc at least with the defaults
-        if(level == Level.FINE) {
+        if( level == Level.FINE )
+        {
             level = Level.INFO;
         }
-        log.log(level, LOGPREFIX + message);
+        log.log( level, LOGPREFIX + message );
     }
 
     // -1 version < compareVersion
     // 0 version equals compareVersion
     // 1 version > compareVersion
-    public int versionCompare(String version, String compareVersion) {
+    public int versionCompare( String version, String compareVersion )
+    {
         int major = 0;
         int minor = 0;
         int revision = 0;
 
-        String[] parts = version.split("\\.");
-        if(parts.length > 0 && parts[0] != null) {
-            major = Integer.decode(parts[0]);
+        String[] parts = version.split( "\\." );
+        if( parts.length > 0 && parts[0] != null )
+        {
+            major = Integer.decode( parts[0] );
         }
-        if(parts.length > 1 && parts[1] != null) {
-            minor = Integer.decode(parts[1]);
+        if( parts.length > 1 && parts[1] != null )
+        {
+            minor = Integer.decode( parts[1] );
         }
-        if(parts.length > 2 && parts[2] != null) {
-            revision = Integer.decode(parts[2]);
+        if( parts.length > 2 && parts[2] != null )
+        {
+            revision = Integer.decode( parts[2] );
         }
-        clog(Level.FINE, "Version: Major: " + major + " Minor: " + minor + " Revision: " + revision);
+        clog( Level.FINE, "Version: Major: " + major + " Minor: " + minor + " Revision: " + revision );
 
-        int existingVersion = major*1000000+minor*1000+revision;
+        int existingVersion = major * 1000000 + minor * 1000 + revision;
 
-        parts = compareVersion.split("\\.");
-        if(parts.length > 0 && parts[0] != null) {
-            major = Integer.decode(parts[0]);
+        parts = compareVersion.split( "\\." );
+        if( parts.length > 0 && parts[0] != null )
+        {
+            major = Integer.decode( parts[0] );
         }
-        if(parts.length > 1 && parts[1] != null) {
-            minor = Integer.decode(parts[1]);
+        if( parts.length > 1 && parts[1] != null )
+        {
+            minor = Integer.decode( parts[1] );
         }
-        if(parts.length > 2 && parts[2] != null) {
-            revision = Integer.decode(parts[2]);
+        if( parts.length > 2 && parts[2] != null )
+        {
+            revision = Integer.decode( parts[2] );
         }
-        clog(Level.FINE, "CompareVersion: Major: " + major + " Minor: " + minor + " Revision: " + revision);
+        clog( Level.FINE, "CompareVersion: Major: " + major + " Minor: " + minor + " Revision: " + revision );
 
-        int breakVersion = major*1000000+minor*1000+revision;
+        int breakVersion = major * 1000000 + minor * 1000 + revision;
 
-        if(existingVersion < breakVersion) {
+        if( existingVersion < breakVersion )
+        {
             return -1;
-        } else if (existingVersion == breakVersion) {
+        }
+        else if( existingVersion == breakVersion )
+        {
             return 0;
-        } else {
+        }
+        else
+        {
             return 1;
         }
     }
 
     // Converts from Chat to Map color space
-    String colorize2(String s) {
-        String result = s.replace("\\n","\n");
-        Pattern p = Pattern.compile("&(\\p{XDigit})");
-        Matcher m = p.matcher(s);
-        while (m.find()) {
-            result = result.replaceAll(m.group(), "§" + convertToMapColor(Byte.parseByte(m.group().substring(1), 16)) + ";");
+    String colorize2( String s )
+    {
+        String result = s.replace( "\\n", "\n" );
+        Pattern p = Pattern.compile( "&(\\p{XDigit})" );
+        Matcher m = p.matcher( s );
+        while( m.find() )
+        {
+            result = result.replaceAll( m.group(), "§" + convertToMapColor( Byte.parseByte( m.group().substring( 1 ), 16 ) ) + ";" );
         }
         return result;
     }
 
     // credits: theguynextdoor - http://forums.bukkit.org/threads/adding-color-support.52980/#post-890244
     // see ChatColor.java for value validity
-    String colorize(String s) {
-        return s.replaceAll("(&(\\p{XDigit}))", "\u00A7$2");
+    String colorize( String s )
+    {
+        return s.replaceAll( "(&(\\p{XDigit}))", "\u00A7$2" );
     }
 
-    String strip(String s) {
+    String strip( String s )
+    {
 //        return s.replaceAll("(§(\\p{Digit}+);)", "");
-        return s.replaceAll("(&(\\p{XDigit}))", "");
+        return s.replaceAll( "(&(\\p{XDigit}))", "" );
     }
 
     // code lifted from ScrollingMenuSign by desht (CC-BY-NC)
@@ -511,51 +600,71 @@ public class CourierConfig {
     private byte[] colorCache = new byte[16];
     private boolean[] colorInited = new boolean[16];
 
-    byte convertToMapColor(byte color) {
-        if(color < 0 || color > 15) {
-            clog(Level.FINE, "Out of bounds color value passed to convertToMapColor");
+    byte convertToMapColor( byte color )
+    {
+        if( color < 0 || color > 15 )
+        {
+            clog( Level.FINE, "Out of bounds color value passed to convertToMapColor" );
             return MapPalette.DARK_BROWN;
         }
 
-        if (colorInited[color]) {
+        if( colorInited[color] )
+        {
             return colorCache[color];
         }
 
         byte result = MapPalette.DARK_GRAY;
 
-        switch (color) {
+        switch( color )
+        {
             case 0:
-                result = MapPalette.matchColor(0, 0, 0); break;
+                result = MapPalette.matchColor( 0, 0, 0 );
+                break;
             case 1:
-                result = MapPalette.matchColor(0, 0, 128); break;
+                result = MapPalette.matchColor( 0, 0, 128 );
+                break;
             case 2:
-                result = MapPalette.matchColor(0, 128, 0); break;
+                result = MapPalette.matchColor( 0, 128, 0 );
+                break;
             case 3:
-                result = MapPalette.matchColor(0, 128, 128); break;
+                result = MapPalette.matchColor( 0, 128, 128 );
+                break;
             case 4:
-                result = MapPalette.matchColor(128, 0, 0); break;
+                result = MapPalette.matchColor( 128, 0, 0 );
+                break;
             case 5:
-                result = MapPalette.matchColor(128, 0, 128); break;
+                result = MapPalette.matchColor( 128, 0, 128 );
+                break;
             case 6:
-                result = MapPalette.matchColor(128, 128, 0); break;
+                result = MapPalette.matchColor( 128, 128, 0 );
+                break;
             case 7:
-                result = MapPalette.matchColor(128, 128, 128); break;
+                result = MapPalette.matchColor( 128, 128, 128 );
+                break;
             case 8:
-                result = MapPalette.matchColor(64, 64, 64); break;
+                result = MapPalette.matchColor( 64, 64, 64 );
+                break;
             case 9:
-                result = MapPalette.matchColor(0, 0, 255); break;
+                result = MapPalette.matchColor( 0, 0, 255 );
+                break;
             case 10:
-                result = MapPalette.matchColor(0, 255, 0); break;
+                result = MapPalette.matchColor( 0, 255, 0 );
+                break;
             case 11:
-                result = MapPalette.matchColor(0, 255, 255); break;
+                result = MapPalette.matchColor( 0, 255, 255 );
+                break;
             case 12:
-                result = MapPalette.matchColor(255, 0, 0); break;
+                result = MapPalette.matchColor( 255, 0, 0 );
+                break;
             case 13:
-                result = MapPalette.matchColor(255, 0, 255); break;
+                result = MapPalette.matchColor( 255, 0, 255 );
+                break;
             case 14:
-                result = MapPalette.matchColor(255, 255, 0); break;
+                result = MapPalette.matchColor( 255, 255, 0 );
+                break;
             case 15:
-                result = MapPalette.matchColor(255, 255, 255); break;
+                result = MapPalette.matchColor( 255, 255, 255 );
+                break;
         }
 
         colorInited[color] = true;

@@ -12,24 +12,30 @@ import org.bukkit.entity.Player;
  * I could refrain from doing .setTarget() of course - see getWalkToPlayer()
  *
  */
-public class CreaturePostman extends Postman {
+public class CreaturePostman extends Postman
+{
 
-    CreaturePostman(Courier plug, Player p, int id, EntityType t) {
-        super(plug, p, id, t);
+    CreaturePostman( Courier plug, Player p, int id, EntityType t )
+    {
+        super( plug, p, id, t );
     }
 
-    public void spawn(Location l) {
-        postman = (Creature) player.getWorld().spawnEntity(l, type);
-        if(plugin.getCConfig().getWalkToPlayer()) {
-            postman.setTarget(player);
+    public void spawn( Location l )
+    {
+        postman = ( Creature ) player.getWorld().spawnEntity( l, type );
+        if( plugin.getCConfig().getWalkToPlayer() )
+        {
+            postman.setTarget( player );
         }
         uuid = postman.getUniqueId();
     }
 
     @Override
-    public void drop() {
-        if(plugin.getCConfig().getWalkToPlayer()) {
-            postman.setTarget(null);
+    public void drop()
+    {
+        if( plugin.getCConfig().getWalkToPlayer() )
+        {
+            postman.setTarget( null );
         }
         super.drop();
     }
